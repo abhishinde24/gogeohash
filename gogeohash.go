@@ -4,7 +4,7 @@ const base32 = "0123456789bcdefghjkmnpqrstuvwxyz" // (geohash-specific) Base32 m
 
 type GeoHash struct{}
 
-func (g GeoHash) encode(lat float64, lon float64, precision int) (string, error) {
+func (g GeoHash) Encode(lat float64, lon float64, precision int) (string, error) {
 	/* try to get precision by lat and log precision given
 	 */
 
