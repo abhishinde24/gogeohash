@@ -142,3 +142,56 @@ func (g GeoHash)bound(geohash string) (bounds,error){
 	}
 	return bound,nil
 }
+
+func (g GeoHash) adjacent(geohash string,direction string) (string){
+
+	geohash = strings.ToLower(geohash)
+	direction = strings.ToLower(direction)
+
+	if len(geohash) == 0 {
+		return ""	
+	}
+	if strings.Index("nsew",direction) == -1 {
+		return ""
+	} 
+
+	neighbour := map[string][]string{
+	"n": {"p0r21436x8zb9dcf5h7kjnmqesgutwvy", "bc01fg45238967deuvhjyznpkmstqrwx"},
+	"s": {"14365h7k9dcfesgujnmqp0r2twvyx8zb", "238967debc01fg45kmstqrwxuvhjyznp"},
+	"e": {"bc01fg45238967deuvhjyznpkmstqrwx", "p0r21436x8zb9dcf5h7kjnmqesgutwvy"},
+	"w": {"238967debc01fg45kmstqrwxuvhjyznp", "14365h7k9dcfesgujnmqp0r2twvyx8zb"},
+	}
+
+	border := map[string][]string{
+	"n": {"prxz", "bcfguvyz"},
+	"s": {"028b", "0145hjnp"},
+	"e": {"bcfguvyz", "prxz"},
+	"w": {"0145hjnp", "028b"},
+	}
+
+	lastCh := geohash[len(geohash) - 1:];    // last character of hash
+	parent := geohash[0:len(geohash) - 1]; // hash without last character
+	
+	Bittype := len(geohash) % 2;
+
+	// check for edge-cases which don't share common prefix
+	if (strings.Index(border[direction][Bittype],lastCh) != -1 && parent != "") {
+		parent = g.adjacent(parent, direction);
+	}
+
+	// append letter for direction to parent
+	return parent + string(base32[strings.Index(neighbour[direction][Bittype],lastCh)]);
+} 
+
+func (g GeoHash) Neighbours(geohash string) map[string]string{
+	return map[string]string{
+		"n":g.adjacent(geohash,"n"),
+		"ne":g.adjacent(g.adjacent(geohash,"n"),"e"),
+		"e":g.adjacent(geohash,"e"),
+		"se":g.adjacent(g.adjacent(geohash,"s"),"e"),
+		"s":g.adjacent(geohash,"s"),
+		"sw":g.adjacent(g.adjacent(geohash,"s"),"w"),
+		"w":g.adjacent(geohash,"w"),
+		"nw":g.adjacent(g.adjacent(geohash,"n"),"w"),
+	}
+}

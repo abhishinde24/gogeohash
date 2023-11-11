@@ -29,6 +29,25 @@ func TestDecodeHash(t *testing.T) {
     }
 }
 
+func TestHashNeighbours(t *testing.T) {
+    g := GeoHash{}
+	geohash := "u09tvw0f"
+	wantValue := map[string]string{
+		"n": "u09tvw0g",
+		"ne": "u09tvw15",
+		"e": "u09tvw14",
+		"se": "u09tvw11",
+		"s": "u09tvw0c",
+		"sw": "u09tvw09",
+		"w": "u09tvw0d",
+		"nw": "u09tvw0e",
+	}
+	gotValue := g.Neighbours(geohash)
+    if fmt.Sprint(wantValue) != fmt.Sprint(gotValue) {
+        t.Errorf("Test failed")
+    }
+}
+
 func BenchmarkEncodeHash(b *testing.B) {
     g := GeoHash{}
 	lat1 := 48.8566
@@ -44,5 +63,13 @@ func BenchmarkDecodeHash(b *testing.B) {
 	geo_hash := "u09tvw0f"
 	for i :=0; i < b.N ; i++{
 		g.Decode(geo_hash)
+	}
+}
+
+func BenchmarkHashNeighbours(b *testing.B) {
+    g := GeoHash{}
+	geo_hash := "u09tvw0f"
+	for i :=0; i < b.N ; i++{
+		g.Neighbours(geo_hash)
 	}
 }
